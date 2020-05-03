@@ -29,8 +29,16 @@
 			>+ 添加
 			</button>
 		</view>
+		<view class='add'>
+			<button
+			 class="mini-btn"
+			 type="warn"
+			 size="mini"
+			 bindtap="add"
+			> 插入数据库
+			</button>
+		</view>
 	</view>
-	{{books}}
 	<scroll-view class="lists" scroll-y>
 		<block wx:if="{{curLists.length < 1}}">
 			<view class="nodata">暂无数据</view>
@@ -75,6 +83,34 @@
 				 bindtap="addTodo"
 				 size="mini"
 				>确定添加
+				</button>
+				<button
+				 class="weui-btn mini-btn"
+				 type="default"
+				 bindtap="addTodoHide"
+				 size="mini"
+				>取消
+				</button>
+			</view>
+		</view>
+	</view>
+	<!---->
+	<view>
+		<view class="addForm-div">
+			<input
+			 class="weui-input"
+			 placeholder="请输入邀请码"
+			 value="{{addText}}"
+			 bindinput="setInput"
+			 focus="{{focus}}"
+			/>
+			<view class="addForm-btn">
+				<button
+				 class="weui-btn mini-btn"
+				 type="warn"
+				 bindtap="addTodo"
+				 size="mini"
+				>登录
 				</button>
 				<button
 				 class="weui-btn mini-btn"

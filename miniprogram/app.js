@@ -2,6 +2,9 @@
 App({
     globalData: {},
     onLaunch: function () {
+
+        wx.cloud.init()
+
         var _this = this;
         var logs = wx.getStorageSync('logs') || [];
         logs.unshift(Date.now());

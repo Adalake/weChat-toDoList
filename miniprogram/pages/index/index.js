@@ -2,7 +2,7 @@
 var app = getApp();
 Page({
   data: {
-    motto: "Hello World version-1 233",
+    motto: "Hello World version-1",
     userInfo: {},
     hasUserInfo: false,
     canIUse: wx.canIUse("button.open-type.getUserInfo"),
@@ -12,6 +12,7 @@ Page({
     focus: false,
     lists: [],
     curLists: [],
+    books: [],
     editIndex: 0,
     delBtnWidth: 120, // 删除按钮宽度单位（rpx）
   },
@@ -63,6 +64,18 @@ Page({
     console.log(item);
   },
   addTodoShow: function () {
+    const db = wx.cloud.database();
+    db.collection("books").get({
+      success: function (res) {
+        console.log(res.data, "sql");
+        this.setData({
+          books: res.data,
+        });
+      },
+    });
+
+  
+    // test
     this.setData({
       addShow: true,
       focus: true,
@@ -253,6 +266,16 @@ Page({
   //     }
   //   },
   onLoad: function () {
+    const db = wx.cloud.database();
+    db.collection("books").get({
+      success: function (res) {
+        console.log(res, "sql");
+        this.setData({
+          books: res.data,
+        });
+      },
+    });
+
     var _this = this;
     wx.getStorage({
       key: "lists",

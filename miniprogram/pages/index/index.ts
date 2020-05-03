@@ -4,10 +4,19 @@ const app = getApp<IAppOption>();
 
 Page({
   data: {
-    motto: "Hello World 2363",
+    motto: "Hello World version_0",
     userInfo: {},
     hasUserInfo: false,
     canIUse: wx.canIUse("button.open-type.getUserInfo"),
+    addShow: false,
+    addText: "",
+    status: "1",
+    focus: false,
+    lists: [],
+    curLists: [],
+    books: [],
+    editIndex: 0,
+    delBtnWidth: 120,
   },
   // 事件处理函数
   bindViewTap() {
@@ -16,6 +25,16 @@ Page({
     });
   },
   onLoad() {
+    const db = wx.cloud.database();
+    db.collection("books").get({
+      success: (res) => {
+        console.log(res, "sql233");
+        this.setData({
+          books: res.data,
+        });
+      },
+    });
+
     if (app.globalData.userInfo) {
       this.setData({
         userInfo: app.globalData.userInfo,

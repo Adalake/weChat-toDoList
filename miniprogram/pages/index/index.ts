@@ -1,5 +1,11 @@
 // index.ts
 // 获取应用实例
+
+// TODO step 0: 输入邀请码（openid）验证，这样就可以按邀请码拉出该用户的打卡时间
+// TODO step 1: 打勾，向数据库插入一条消息
+// TODO step 2: 从数据库查询所有消息，并展示到页面
+var util = require("../../utils/util.js");
+
 const app = getApp<IAppOption>();
 let context: any;
 Page({
@@ -17,8 +23,67 @@ Page({
     books: [],
     editIndex: 0,
     delBtnWidth: 120,
+    curDay: "",
+    addUserInfo: "",
+    studyStatus: 0,
+    lastId: "",
   },
   // 事件处理函数
+
+  studyDone: () => {
+    const db = wx.cloud.database();
+
+    console.log(2);
+    if (context.data.studyStatus === 0) {
+      context.setData({
+        studyStatus: 1,
+      });
+
+      db.collection("todolist").add({
+        data: {
+          done: true,
+          userId: "test userId in radio",
+          curDay: context.data.curDay,
+        },
+        success: (res: any) => {
+          context.setData({
+            lastId: res["_id"],
+          }),
+            wx.showToast({
+              title: "今日学习打卡",
+            });
+        },
+      });
+    } else {
+      wx.showModal({
+        title: "删除今天的打卡",
+        content: "您确定要删除今天的打卡吗？",
+        confirmText: "确认删除",
+        cancelText: "取消",
+        success: (res: any) => {
+          if (res.confirm) {
+            db
+              .collection("todolist")
+              .doc(context.data.lastId)
+              .remove({
+                success: () => {
+                  wx.showToast({
+                    title: "删除成功",
+                  });
+                },
+              }),
+              context.setData({
+                studyStatus: 0,
+              });
+            console.log("用户确认删除");
+          } else {
+            console.log("用户取消");
+          }
+        },
+      });
+    }
+  },
+
   bindViewTap() {
     wx.navigateTo({
       url: "../logs/logs",
@@ -26,7 +91,9 @@ Page({
   },
 
   onLoad() {
+    // 转化全局的this
     context = this;
+    // 获取数据库数据
     const db = wx.cloud.database();
     db.collection("books").get({
       success: function (res) {
@@ -36,6 +103,14 @@ Page({
         });
       },
     });
+    // 获取今天的时间
+    let time = util.formatTime(new Date());
+    const getDay = time.split(" ")[0];
+    this.setData({
+      curDay: getDay,
+    });
+    console.log(context.curDay, "today");
+
     wx.getStorage({
       key: "lists",
       success: function (res) {
@@ -75,7 +150,6 @@ Page({
   },
 
   getUserInfo(e: any) {
-    console.log(e, "get userinfo");
     app.globalData.userInfo = e.detail.userInfo;
     this.setData({
       userInfo: e.detail.userInfo,
@@ -87,7 +161,7 @@ Page({
     const db = wx.cloud.database();
     db.collection("books").get({
       success: (res) => {
-        console.log(res.data, "sql");
+        console.log(res.data, "sql when add something");
         context.setData({
           books: res.data,
         });
@@ -97,7 +171,6 @@ Page({
       addShow: true,
       focus: true,
     });
-    console.log("233");
   },
 
   addTodo: () => {
@@ -105,7 +178,7 @@ Page({
       return;
     }
     let temp = context.data.lists;
-    var addT: any = {
+    let addT: any = {
       id: new Date().getTime(),
       title: context.data.addText,
       status: "0",
@@ -149,11 +222,32 @@ Page({
   },
 
   changeTodo: (e: any) => {
+    const db = wx.cloud.database();
     let item = e.currentTarget.dataset.item;
     let temp = context.data.lists;
     temp.forEach((el: any) => {
       if (el.id === item) {
         if (el.status === "0") {
+          db.collection("books").add({
+            data: {
+              name: "lake test",
+              author: "lake test",
+              price: 92,
+            },
+            success: () => {
+              wx.showToast({
+                title: "新增记录成功",
+              });
+              wx.navigateTo({
+                url: "../index/index",
+              });
+            },
+            fail: () => {
+              wx.showToast({
+                title: "新增失败",
+              });
+            },
+          });
           el.status = "1";
           context.showCur(temp);
           wx.setStorage({
@@ -194,6 +288,31 @@ Page({
     context.setData({
       addText: e.detail.value,
     });
+  },
+
+  setUser: (e: any) => {
+    context.setData({
+      addUserInfo: e.detail.value,
+    });
+  },
+
+  addUser: () => {
+    const db = wx.cloud.database();
+    console.log(context.data.addUserInfo);
+    if (context.data.addUserInfo === "test 2")
+      db.collection("todolist").add({
+        data: {
+          openid: context.data.addUserInfo,
+          done: true,
+          curDay: context.data.curDay,
+        },
+        success: () => {
+          wx.showToast({
+            title: "邀请码验证成功",
+          });
+        },
+        // 然后页面跳转到登录状态
+      });
   },
 
   showStatus: (e: any) => {

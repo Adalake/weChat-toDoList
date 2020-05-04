@@ -1,6 +1,23 @@
 <!--logs.wxml-->
-<view class="container log-list">
-  <block wx:for="{{logs}}" wx:for-item="log">
-    <text class="log-item">{{index + 1}}. {{log}}</text>
-  </block>
+<view>
+	<view class="addForm-div">
+		<input
+		 class="weui-input"
+		 placeholder="请输入邀请码"
+		 value="{{addUserInfo}}"
+		 bindinput="setUser"
+		 focus="{{focus}}"
+		/>
+		<view class="addForm-btn">
+			<button
+			 class="weui-btn mini-btn"
+			 type="warn"
+			 bindtap="addUser"
+			 size="mini"
+			>登录
+			</button>
+		
+		</view>
+	</view>
 </view>
+

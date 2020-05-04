@@ -20,30 +20,20 @@
 			<text class="{{status === '2'?'active':''}}" data-status="2" bindtap="showStatus">未完成</text>
 			<text class="{{status === '3'?'active':''}}" data-status="3" bindtap="showStatus">已完成</text>
 		</view>
-		{{curDay}}
 		<view class='add'>
 			<button
 			 class="mini-btn"
 			 type="warn"
 			 size="mini"
 			 bindtap="addTodoShow"
-			> +
-			</button>
-		</view>
-		<view class='add'>
-			<button
-			 class="mini-btn"
-			 type="warn"
-			 size="mini"
-			 bindtap="add"
-			> addDB
+			> 添加待办事项
 			</button>
 		</view>
 	</view>
 	<!-- -->
 	<view>
 		<icon class="icon-small" type="{{studyStatus === 0?'circle':'success'}}" bindtap="studyDone" />
-		今天学习了吗 {{studyStatus}}
+		今天学习了吗 {{tempId}}
 	</view>
 	<!-- -->
 
@@ -102,8 +92,8 @@
 			</view>
 		</view>
 	</view>
-	<!---->
-	<view>
+
+	<!--<view>
 		<view class="addForm-div">
 			<input
 			 class="weui-input"
@@ -129,6 +119,6 @@
 				</button>
 			</view>
 		</view>
-	</view>
+	</view>-->
 </view>
 

@@ -1,7 +1,7 @@
 // index.ts
 // 获取应用实例
 
-// TODO step 0: 输入邀请码（openid）验证，这样就可以按邀请码拉出该用户的打卡时间
+// TODO step 0: 输入邀请码验证，这样就可以按邀请码拉出该用户的打卡时间
 // TODO step 1: 打勾，向数据库插入一条消息
 // TODO step 2: 从数据库查询所有消息，并展示到页面
 var util = require("../../utils/util.js");
@@ -10,7 +10,7 @@ const app = getApp<IAppOption>();
 let context: any;
 Page({
   data: {
-    motto: "todolist version_1",
+    motto: "to do list",
     userInfo: {},
     hasUserInfo: false,
     canIUse: wx.canIUse("button.open-type.getUserInfo"),
@@ -32,13 +32,10 @@ Page({
 
   studyDone: () => {
     const db = wx.cloud.database();
-
-    console.log(2);
     if (context.data.studyStatus === 0) {
       context.setData({
         studyStatus: 1,
       });
-
       db.collection("todolist").add({
         data: {
           done: true,
@@ -77,7 +74,7 @@ Page({
               });
             console.log("用户确认删除");
           } else {
-            console.log("用户取消");
+            console.log("用户取消了操作");
           }
         },
       });
@@ -95,12 +92,14 @@ Page({
     context = this;
     // 获取数据库数据
     const db = wx.cloud.database();
-    db.collection("books").get({
-      success: function (res) {
-        console.log(res, "sql");
-        context.setData({
-          books: res.data,
-        });
+    db.collection("todolist").get({
+      success: (e: any) => {
+        if (e.data[e.data.length - 1]["curDay"] === getDay) {
+          context.setData({
+            studyStatus: 1,
+            lastId: e.data[e.data.length - 1]["_id"],
+          });
+        }
       },
     });
     // 获取今天的时间
@@ -121,6 +120,7 @@ Page({
         });
       },
     });
+
     if (app.globalData.userInfo) {
       this.setData({
         userInfo: app.globalData.userInfo,
@@ -158,15 +158,6 @@ Page({
   },
 
   addTodoShow: () => {
-    const db = wx.cloud.database();
-    db.collection("books").get({
-      success: (res) => {
-        console.log(res.data, "sql when add something");
-        context.setData({
-          books: res.data,
-        });
-      },
-    });
     context.setData({
       addShow: true,
       focus: true,
@@ -222,32 +213,11 @@ Page({
   },
 
   changeTodo: (e: any) => {
-    const db = wx.cloud.database();
     let item = e.currentTarget.dataset.item;
     let temp = context.data.lists;
     temp.forEach((el: any) => {
       if (el.id === item) {
         if (el.status === "0") {
-          db.collection("books").add({
-            data: {
-              name: "lake test",
-              author: "lake test",
-              price: 92,
-            },
-            success: () => {
-              wx.showToast({
-                title: "新增记录成功",
-              });
-              wx.navigateTo({
-                url: "../index/index",
-              });
-            },
-            fail: () => {
-              wx.showToast({
-                title: "新增失败",
-              });
-            },
-          });
           el.status = "1";
           context.showCur(temp);
           wx.setStorage({

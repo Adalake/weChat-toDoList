@@ -4,6 +4,9 @@
 // TODO step 0: 输入邀请码验证，这样就可以按邀请码拉出该用户的打卡时间
 // TODO step 1: 打勾，向数据库插入一条消息
 // TODO step 2: 从数据库查询所有消息，并展示到页面
+
+// TODO step 3: 验证当前日期和userId
+// TODO step 4: 展示所有用户的数据
 var util = require("../../utils/util.js");
 
 const app = getApp<IAppOption>();
@@ -27,6 +30,9 @@ Page({
     addUserInfo: "",
     studyStatus: 0,
     lastId: "",
+    userId: "", // 邀请码
+    user2List: [],
+    user3List: [],
   },
   // 事件处理函数
 
@@ -39,7 +45,7 @@ Page({
       db.collection("todolist").add({
         data: {
           done: true,
-          userId: "test userId in radio",
+          userId: context.data.userId,
           curDay: context.data.curDay,
         },
         success: (res: any) => {
@@ -80,6 +86,19 @@ Page({
       });
     }
   },
+  showLog: () => {
+    const db = wx.cloud.database();
+    db.collection("todolist").get({
+      success: (e: any) => {
+        console.log(e.data.filter((x: any) => x["userId"] === "test 3"));
+
+        context.setData({
+          user2List: e.data.filter((x: any) => x["userId"] === "test 2"),
+          user3List: e.data.filter((x: any) => x["userId"] === "test 3"),
+        });
+      },
+    });
+  },
 
   bindViewTap() {
     wx.navigateTo({
@@ -88,20 +107,33 @@ Page({
   },
 
   onLoad() {
-    // 转化全局的this
+    // 转化全局的this指向
     context = this;
-    // 获取数据库数据
+
     const db = wx.cloud.database();
-    db.collection("todolist").get({
+    wx.getStorage({
+      key: "userId",
       success: (e: any) => {
-        if (e.data[e.data.length - 1]["curDay"] === getDay) {
-          context.setData({
-            studyStatus: 1,
-            lastId: e.data[e.data.length - 1]["_id"],
+        context.setData({
+          userId: e.data,
+        }),
+          console.log(e.data, "存入本地的userId");
+        db.collection("todolist")
+          .where({ userId: e.data })
+          .get({
+            success: (e: any) => {
+              console.log(e, "不同的userId");
+              if (e.data[e.data.length - 1]["curDay"] === getDay) {
+                context.setData({
+                  studyStatus: 1,
+                  lastId: e.data[e.data.length - 1]["_id"],
+                });
+              }
+            },
           });
-        }
       },
     });
+
     // 获取今天的时间
     let time = util.formatTime(new Date());
     const getDay = time.split(" ")[0];

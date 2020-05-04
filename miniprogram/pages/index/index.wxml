@@ -35,6 +35,19 @@
 		<icon class="icon-small" type="{{studyStatus === 0?'circle':'success'}}" bindtap="studyDone" />
 		今天学习了吗 {{tempId}}
 	</view>
+	<view class='add'>
+		<button
+		 class="mini-btn"
+		 type="warn"
+		 size="mini"
+		 bindtap="showLog"
+		> 查看打卡记录
+		</button>
+	</view>
+
+	<view wx:for="{{user2List}}" wx:for-item='itemName' wx:key="index">
+		{{itemName.curDay}}
+	</view>
 	<!-- -->
 
 	<scroll-view class="lists" scroll-y>

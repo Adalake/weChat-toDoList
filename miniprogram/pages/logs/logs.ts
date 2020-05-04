@@ -37,12 +37,9 @@ Page({
     });
   },
   addUser: () => {
-    // const db = wx.cloud.database();
-    console.log(_context.data.addUserInfo);
     if (
-      _context.data.addUserInfo === "test 2"
-      //  &&
-      // _context.data.isClicked === true
+      _context.data.addUserInfo === "test 2" || 
+      _context.data.addUserInfo === "test 3"
       // 如果用户当天已经往数据库里插入消息了，此时就不能再插消息
     ) {
       // db.collection("todolist").add({
@@ -57,8 +54,14 @@ Page({
       //     });
       //   },
       // });
-      wx.navigateTo({
-        url: "../index/index",
+      wx.setStorage({
+        key: "userId",
+        data: _context.data.addUserInfo,
+        success: () => {
+          wx.navigateTo({
+            url: "../index/index",
+          });
+        },
       });
     } else {
       wx.showModal({

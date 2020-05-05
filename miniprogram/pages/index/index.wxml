@@ -44,9 +44,21 @@
 		> 查看打卡记录
 		</button>
 	</view>
-
-	<view wx:for="{{user2List}}" wx:for-item='itemName' wx:key="index">
-		{{itemName.curDay}}
+	<view>
+		<block wx:if="{{user2List.length > 0}}">
+			<view>test 2用户的打卡：</view>
+		</block>
+		<view wx:for="{{user2List}}" wx:for-item='itemName' wx:key="index">
+			{{itemName.curDay}}
+		</view>
+	</view>
+	<view>
+		<block wx:if="{{user3List.length > 0}}">
+			<view>test 3用户的打卡：</view>
+		</block>
+		<view wx:for="{{user3List}}" wx:for-item='itemName' wx:key="index">
+			{{itemName.curDay}}
+		</view>
 	</view>
 	<!-- -->
 

@@ -10,7 +10,7 @@ Page({
     isClicked: false,
   },
   onLoad: function () {
-    _context = this;
+    _context = this; 
     var time = util.formatTime(new Date());
     var getDay = time.split(" ")[0];
     this.setData({

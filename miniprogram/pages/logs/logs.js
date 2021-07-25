@@ -10,14 +10,13 @@ Page({
     isClicked: false,
   },
   onLoad: function () {
-    _context = this; 
+    _context = this;
     var time = util.formatTime(new Date());
     var getDay = time.split(" ")[0];
     this.setData({
       curDay: getDay,
     });
     var db = wx.cloud.database(); // 初始化
-    console.log(db);
     db.collection("todolist").get({
       success: function (e) {
         if (e.data.pop()["curDay"] === getDay) {

@@ -70,30 +70,11 @@ export default {
                 if (api.indexOf("index") == -1) {
                   // 文章详情
                   that.detailGet(dom_container);
-                  console.log("文章详情");
                 } else {
                   // 文章列表
-                  var list_start = dom_container.indexOf(
-                    '<ul class="chapter">'
-                  );
-                  var list_end = dom_container.indexOf(
-                    '<div class="listpage">'
-                  );
-                  var list = dom_container.slice(list_start, list_end); //获取正文内容
-                  that.data1 = list;
-                  // console.log("文章列表", list_start, list_end, list);
-                  // test lake
-                  that.apiList = list.split(".html").map((x) => {
-                    //链接地址
-                    var q = x.indexOf("<li>");
-                    var w = x.slice(q);
-                    return w.replace(/[^0-9]/gi, ""); // 正则 寻找数字
-                  });
-                  that.apiList.pop();
-                  console.log("文章列表", that.apiList, list);
+                  that.listGet(dom_container);
                 }
                 that.timer = setTimeout(() => {
-                  // console.log(dom_container);
                   // that.apiGet("/api/103631738_2.html");
                 });
               };
@@ -116,12 +97,25 @@ export default {
       var title_temp = title.indexOf(" ");
       title = title.slice(0, title_temp);
       // console.log(title, detail);
+      console.log("文章详情");
       // that.downloadtext(`${title}.html`, detail); //下载当前html
     },
     btnClick() {
       this.apiGet("/api/index_86.html");
     },
-    listGet() {},
+    listGet(dom_container) {
+      var list_start = dom_container.indexOf('<ul class="chapter">');
+      var list_end = dom_container.indexOf('<div class="listpage">');
+      var list = dom_container.slice(list_start, list_end); //获取正文内容
+      this.data1 = list;
+      this.apiList = list.split(".html").map((x) => {
+        var q = x.indexOf("<li>");
+        var w = x.slice(q);
+        return w.replace(/[^0-9]/gi, ""); // 正则 寻找数字
+      });
+      this.apiList.pop();
+      console.log("文章列表", this.apiList, list);
+    },
     nextDomGet() {},
   },
   mounted() {

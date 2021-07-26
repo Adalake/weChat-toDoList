@@ -1,6 +1,11 @@
 ```
 <template>
-  <div class="test" ref="testDom" v-html="data1"></div>
+  <div>
+    <div class="test" ref="testDom" v-html="data1"></div>
+    <van-button class="btn" @click="btnClick" type="primary"
+      >获取列表</van-button
+    >
+  </div>
 </template>
 
 <script>
@@ -30,7 +35,9 @@ service.interceptors.response.use(
 export default {
   data() {
     return {
-      data1: "",
+      data1: "疯狂加载中...",
+      timer: null,
+      apiList: [],
     };
   },
   methods: {
@@ -49,44 +56,76 @@ export default {
 
       document.body.removeChild(element);
     },
-    apiGet() {
+    apiGet(api) {
       var that = this;
       service
-        .get("/api/103631738.html", {
+        .get(api, {
           responseType: "blob",
           transformResponse: [
             function(data) {
               let reader = new FileReader();
               reader.readAsText(data, "GBK");
               reader.onload = function(e) {
-                var a = reader.result;
-                var b = a.indexOf('<div class="content">');
-                var c = a.indexOf("记住手机版网址");
-                var d = a.slice(b+21, c);
-                console.log(d, b, c);
-                that.downloadtext("test.html", d);
-                that.data1 = reader.result;
+                var dom_container = reader.result; // 获取dom
+                if (api.indexOf("index") == -1) {
+                  // 文章详情
+                  that.detailGet(dom_container);
+                  console.log("文章详情");
+                } else {
+                  // 文章列表
+                  var list_start = dom_container.indexOf(
+                    '<ul class="chapter">'
+                  );
+                  var list_end = dom_container.indexOf(
+                    '<div class="listpage">'
+                  );
+                  var list = dom_container.slice(list_start, list_end); //获取正文内容
+                  that.data1 = list;
+                  // console.log("文章列表", list_start, list_end, list);
+                  // test lake
+                  that.apiList = list.split(".html").map((x) => {
+                    //链接地址
+                    var q = x.indexOf("<li>");
+                    var w = x.slice(q);
+                    return w.replace(/[^0-9]/gi, ""); // 正则 寻找数字
+                  });
+                  that.apiList.pop();
+                  console.log("文章列表", that.apiList, list);
+                }
+                that.timer = setTimeout(() => {
+                  // console.log(dom_container);
+                  // that.apiGet("/api/103631738_2.html");
+                });
               };
               return data;
             },
           ],
         })
-        .then(() => {
-          this.domControl();
-        })
+        .then(() => {})
         .catch((err) => {
           console.log(err);
         });
     },
-    domControl() {
-      console.log("_____", this.data1);
-      // this.downloadtext("test.html", "asdasda");
+    detailGet(dom_container) {
+      var detail_start = dom_container.indexOf('<div class="content">');
+      var detail_end = dom_container.indexOf("记住手机版网址");
+      var detail = dom_container.slice(detail_start + 21, detail_end); //获取正文内容
+      var title_start = dom_container.indexOf("<title>");
+      var title_end = dom_container.indexOf("</title>");
+      var title = dom_container.slice(title_start + 7, title_end); // 获取标题
+      var title_temp = title.indexOf(" ");
+      title = title.slice(0, title_temp);
+      // console.log(title, detail);
+      // that.downloadtext(`${title}.html`, detail); //下载当前html
     },
+    btnClick() {
+      this.apiGet("/api/index_86.html");
+    },
+    listGet() {},
+    nextDomGet() {},
   },
   mounted() {
-    // this.downloadtext('test.html','adadad')
-    // this.test(this.data1);
-    this.apiGet();
+    // this.apiGet("/api/103631738.html");
   },
 };
 </script>
